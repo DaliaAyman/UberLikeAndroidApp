@@ -22,15 +22,19 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMarkerDragListener {
     public final int  MY_PERMISSIONS_REQUEST_FINE_LOCATION = 0;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private LocationRequest request;
     private GoogleMap mMap;
+    LatLng currentLocation;
+    LatLng requestLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +49,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (Services_available) {
             buildGoogleApiClient();
             createLocationRequest();
-
         }
-
+        currentLocation = new LatLng(0,0);
+        requestLocation = new LatLng(10,10);
     }
 
     @Override
@@ -64,8 +68,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     @Override
     public void onMapReady(GoogleMap map) {
-        mMap=map;
-        map.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+
+        mMap = map;
+        mMap.addMarker(new MarkerOptions().position(currentLocation).title("Current Location"));
+
+        mMap.addMarker(new MarkerOptions()
+                .position(requestLocation)
+                .draggable(true)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+
+
+        //mMap.setMyLocationEnabled(true);
 
     }
 
@@ -84,9 +97,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onLocationChanged(Location location) {
         mLastLocation=location;
-        if (mLastLocation != null)
-
+        if (mLastLocation != null){
             Toast.makeText(this, "Latitude:" + mLastLocation.getLatitude() + ", Longitude:" + mLastLocation.getLongitude(), Toast.LENGTH_LONG).show();
+
+        }
     }
 
 
@@ -121,12 +135,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST_FINE_LOCATION);
+        }else{
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, request, this);
+            mMap.setMyLocationEnabled(true);
         }
-
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, request, this);
-
-
-
     }
 
     @Override
@@ -157,6 +169,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         return true;
+    }
+
+
+    @Override
+    public void onMarkerDrag(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
+        requestLocation = marker.getPosition();
+    }
+
+    @Override
+    public void onMarkerDragStart(Marker marker) {
 
     }
 }
