@@ -117,6 +117,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //This method is invoked after requestLocationUpdates
     @Override
     public void onLocationChanged(Location location) {
+        mLastLocation=location;
+        if (mLastLocation != null){
+           // Toast.makeText(this, "Latitude:" + mLastLocation.getLatitude() + ", Longitude:" + mLastLocation.getLongitude(), Toast.LENGTH_LONG).show();
 
         mLastLocation = location;
 

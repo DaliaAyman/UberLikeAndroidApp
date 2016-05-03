@@ -26,9 +26,9 @@ public class MSGReceiver  extends WakefulBroadcastReceiver {
 
         Bundle extras = intent.getExtras();
         Intent msgrcv = new Intent("Msg");
-        msgrcv.putExtra("msg", extras.getString("msg"));
-        msgrcv.putExtra("fromu", extras.getString("fromu"));
-        msgrcv.putExtra("fromname", extras.getString("name"));
+        msgrcv.putExtra("msg", "Ahmed");
+        msgrcv.putExtra("fromu", "says");
+        msgrcv.putExtra("fromname", "Hello");
 
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(msgrcv);
@@ -36,76 +36,4 @@ public class MSGReceiver  extends WakefulBroadcastReceiver {
         startWakefulService(context, (intent.setComponent(comp)));
         setResultCode(Activity.RESULT_OK);
     }
-}
-
-class MSGService extends IntentService {
-
-    SharedPreferences prefs;
-    NotificationCompat.Builder notification;
-    NotificationManager manager;
-
-
-    public MSGService() {
-        super("MSGService");
-    }
-
-
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        Bundle extras = intent.getExtras();
-        GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
-
-        String messageType = gcm.getMessageType(intent);
-        prefs = getSharedPreferences("Chat", 0);
-
-
-        if (!extras.isEmpty()) {
-
-            if (GoogleCloudMessaging.
-                    MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
-                Log.e("L2C", "Error");
-
-            } else if (GoogleCloudMessaging.
-                    MESSAGE_TYPE_DELETED.equals(messageType)) {
-                Log.e("L2C", "Error");
-
-            } else if (GoogleCloudMessaging.
-                    MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-
-                if(!prefs.getString("CURRENT_ACTIVE","").equals(extras.getString("fromu"))) {
-                    sendNotification(extras.getString("msg"), extras.getString("fromu"), extras.getString("name"));
-                }
-                Log.i("TAG", "Received: " + extras.getString("msg"));
-            }
-        }
-        MSGReceiver.completeWakefulIntent(intent);
-    }
-
-
-
-
-    private void sendNotification(String msg,String mobno,String name) {
-
-        Bundle args = new Bundle();
-        args.putString("mobno", mobno);
-        args.putString("name", name);
-        args.putString("msg", msg);
-        //Intent chat = new Intent(this, ChatActivity.class);
-        //chat.putExtra("INFO", args);
-        notification = new NotificationCompat.Builder(this);
-        notification.setContentTitle(name);
-        notification.setContentText(msg);
-        notification.setTicker("New Message !");
-        //notification.setSmallIcon(R.drawable.ic_launcher);
-
-        //PendingIntent contentIntent = PendingIntent.getActivity(this, 1000,
-        //        chat, PendingIntent.FLAG_CANCEL_CURRENT);
-        //notification.setContentIntent(contentIntent);
-        notification.setAutoCancel(true);
-        manager =(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(0, notification.build());
-    }
-
-
 }
