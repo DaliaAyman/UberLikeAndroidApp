@@ -18,6 +18,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import com.google.android.gms.iid.InstanceID;
 import com.mobilecomputing.uberlikeandroidapp.DataModels.Client;
 
 import java.io.BufferedReader;
@@ -43,7 +44,7 @@ public class Signup extends AppCompatActivity {
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     static final String TAG = "uberApp";
-    public static final String SENDER_ID = "UBERLIKEANDROIDAPP";
+    public static final String SENDER_ID = "936214639595";
 
     ArrayList<EditText> focusViews;
 
@@ -88,6 +89,7 @@ public class Signup extends AppCompatActivity {
                     if(checkPlayServices()) {
                         RegisterGCM registration = new RegisterGCM(gcm, getApplicationContext(), editor, client);
                         registration.execute();
+
                     }
                 }
                 else {
@@ -153,23 +155,24 @@ public class Signup extends AppCompatActivity {
         }
         @Override
         protected String doInBackground(String... params) {
-            try {
-                if (gcm == null) {
-                    gcm = GoogleCloudMessaging.getInstance(context);
-                    regid = gcm.register(Signup.SENDER_ID);
-                    Log.e("RegId", regid);
+            if (gcm == null) {
+                gcm = GoogleCloudMessaging.getInstance(context);
 
-                    editor.putString("REG_ID", regid);
-                    editor.commit();
-                    client.setReg_id(regid);
+                InstanceID gcmID = InstanceID.getInstance(context);
+                try {
+                    regid = gcmID.getToken(Signup.SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
                 }
+                //regid = gcmID.getId();
+                Log.e("RegId", regid);
 
-                return  regid;
-
-            } catch (IOException ex) {
-                Log.e("Error", ex.getMessage());
-                return "Fails";
+                editor.putString("REG_ID", regid);
+                editor.commit();
+                client.setReg_id(regid);
             }
+            return  regid;
         }
 
         @Override
