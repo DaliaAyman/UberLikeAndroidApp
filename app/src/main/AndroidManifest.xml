@@ -54,6 +54,9 @@
             android:exported="true" >
         </service>
 
+        <activity android:name=".Login" >
+        </activity>
+
         <service
             android:name=".FetchAddressIntentService"
             android:exported="false"></service>

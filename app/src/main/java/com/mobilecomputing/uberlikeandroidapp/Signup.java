@@ -1,5 +1,6 @@
 package com.mobilecomputing.uberlikeandroidapp;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -44,8 +46,7 @@ public class Signup extends AppCompatActivity {
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     static final String TAG = "uberApp";
-    public static final String SENDER_ID = "936214639595";
-
+    public static final String SENDER_ID = "1296";
     ArrayList<EditText> focusViews;
 
     @Override
@@ -89,7 +90,6 @@ public class Signup extends AppCompatActivity {
                     if(checkPlayServices()) {
                         RegisterGCM registration = new RegisterGCM(gcm, getApplicationContext(), editor, client);
                         registration.execute();
-
                     }
                 }
                 else {
@@ -138,6 +138,7 @@ public class Signup extends AppCompatActivity {
     public static Client getClient() {
         return client;
     }
+
     class RegisterGCM extends AsyncTask<String, String, String> {
 
         GoogleCloudMessaging gcm;
@@ -165,9 +166,6 @@ public class Signup extends AppCompatActivity {
                     e.printStackTrace();
                     Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
                 }
-                //regid = gcmID.getId();
-                Log.e("RegId", regid);
-
                 editor.putString("REG_ID", regid);
                 editor.commit();
                 client.setReg_id(regid);
@@ -230,6 +228,8 @@ public class Signup extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            editor.putBoolean("registered", true);
+            editor.commit();
             Toast.makeText(getApplicationContext(), response.toString() + "               Hello from ahmed", Toast.LENGTH_LONG).show();
         }
 

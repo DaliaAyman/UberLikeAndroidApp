@@ -50,6 +50,18 @@
             android:layout_alignRight="@+id/requestRideBtn"
             android:layout_alignEnd="@+id/requestRideBtn" />
 
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Login"
+            android:id="@+id/login"
+            android:layout_above="@+id/signupButton"
+            android:layout_alignLeft="@+id/signupButton"
+            android:layout_alignStart="@+id/signupButton"
+            android:layout_alignRight="@+id/requestRideBtn"
+            android:layout_alignEnd="@+id/requestRideBtn" />
+
     </RelativeLayout>
 
 </RelativeLayout>

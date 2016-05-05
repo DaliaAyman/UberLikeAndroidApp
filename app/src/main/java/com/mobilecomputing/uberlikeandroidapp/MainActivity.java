@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -43,10 +44,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Location mLastLocation;
     private LocationRequest request;
     private GoogleMap mMap;
-    LatLng currentLocation;
-    LatLng requestLocation;
+    private LatLng currentLocation;
+    private LatLng requestLocation;
 
     Button signUp;
+    Button login;
+    Button requestRide;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,14 +69,38 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         requestLocation = new LatLng(10,10);
 
         signUp = (Button)findViewById(R.id.signupButton);
-        signUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent signup = new Intent(MainActivity.this, Signup.class);
-                startActivity(signup);
-            }
-        });
+        login = (Button)findViewById(R.id.login);
+        requestRide = (Button)findViewById(R.id.requestRideBtn);
 
+        SharedPreferences sharedPreferences = getSharedPreferences("Uber", 0);
+
+        if(sharedPreferences.getBoolean("registered", false)) {
+            signUp.setVisibility(View.GONE);
+            if(sharedPreferences.getBoolean("logged_in", false)) {
+                login.setVisibility(View.GONE);
+            }
+            else {
+                login.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent loginActivity = new Intent(MainActivity.this, Login.class);
+                        startActivity(loginActivity);
+                    }
+                });
+                requestRide.setVisibility(View.GONE);
+            }
+
+        }
+        else {
+            signUp.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent signup = new Intent(MainActivity.this, Signup.class);
+                    startActivity(signup);
+                }
+            });
+            requestRide.setVisibility(View.GONE);
+        }
     }
 
     @Override
