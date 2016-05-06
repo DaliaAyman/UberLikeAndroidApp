@@ -46,7 +46,7 @@ public class Signup extends AppCompatActivity {
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     static final String TAG = "uberApp";
-    public static final String SENDER_ID = "1296";
+    public static final String SENDER_ID = "936214639595";
     ArrayList<EditText> focusViews;
 
     @Override
