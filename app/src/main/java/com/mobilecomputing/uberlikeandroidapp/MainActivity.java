@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,7 +28,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMarkerDragListener {
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerDragListener, LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     public final int  MY_PERMISSIONS_REQUEST_FINE_LOCATION = 0;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
@@ -35,7 +44,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     LatLng currentLocation;
     LatLng requestLocation;
-
+    double lat;
+    double longitude;
+    String type="driver"; //The type of the user (a driver or a client)
+    String ID="5724859b987e1b7c2a555e77"; //Id if the user from registeration
+    double lastLat = 0;
+    double lastLong = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,9 +110,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //This method is invoked after requestLocationUpdates
     @Override
     public void onLocationChanged(Location location) {
-        mLastLocation=location;
-        if (mLastLocation != null){
+
+        mLastLocation = location;
+
+        if (mLastLocation != null) {
             Toast.makeText(this, "Latitude:" + mLastLocation.getLatitude() + ", Longitude:" + mLastLocation.getLongitude(), Toast.LENGTH_LONG).show();
+        }
+        int latEqual=Double.compare(mLastLocation.getLatitude(),lastLat);
+        int LongEqual=Double.compare(mLastLocation.getLongitude(),lastLong);
+        if ((mLastLocation.getLatitude() - lastLat == 0.005) && (mLastLocation.getLongitude() - lastLong == 0.0005) ) {
+            lastLat = mLastLocation.getLatitude();
+            lastLong = mLastLocation.getLongitude();
+            this.lat=mLastLocation.getLatitude();
+            this.longitude=mLastLocation.getLongitude();
+            PutLocation test=new PutLocation();
+            test.execute();
 
         }
     }
@@ -185,5 +211,50 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMarkerDragStart(Marker marker) {
 
+    }
+    class PutLocation extends AsyncTask <Void,Void,Void>{
+    String Url="http://uberlikeapp-ad3rhy2.rhcloud.com//api/user/updateUserLocation";
+        StringBuilder stringBuilder;
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Toast.makeText(getBaseContext(),stringBuilder,Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+
+            try{
+
+                URL url = new URL(Url);
+                HttpURLConnection urlConnection =(HttpURLConnection)url.openConnection();
+                urlConnection.setRequestMethod("PUT");
+                urlConnection.setRequestProperty("type", type);
+                urlConnection.setRequestProperty("driver_id", ID);
+                urlConnection.setRequestProperty("lat", String.valueOf(lat));
+                urlConnection.setRequestProperty("lng", String.valueOf(longitude));
+                urlConnection.setDoInput(true);
+                urlConnection.setDoOutput(true);
+                urlConnection.connect();
+                InputStream in=urlConnection.getInputStream();
+                stringBuilder = new StringBuilder();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    stringBuilder.append(line);
+                }
+
+
+
+
+            }
+           catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally{}
+            return null;
+        }
     }
 }
