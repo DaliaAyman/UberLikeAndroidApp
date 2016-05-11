@@ -2,8 +2,10 @@ package com.mobilecomputing.uberlikeandroidapp;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -47,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LatLng currentLocation;
     private LatLng requestLocation;
 
+    BroadcastReceiver loginEventHandler;
+
     Button signUp;
     Button login;
     Button requestRide;
@@ -59,6 +63,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
+        loginEventHandler = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Toast.makeText(getApplicationContext(), intent.getExtras().toString(), Toast.LENGTH_LONG).show();
+                mMap.addMarker(new MarkerOptions().position(new LatLng(34,34)).title("Ahmed Addition"));
+            }
+        };
+        registerReceiver(loginEventHandler, new IntentFilter("Data_GCM"));
 
         boolean Services_available = checkGooglePlayServices(this);
         if (Services_available) {
@@ -294,5 +308,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             } finally{}
             return null;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(loginEventHandler);
     }
 }
