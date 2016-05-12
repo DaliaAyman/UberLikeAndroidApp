@@ -2,7 +2,11 @@ package com.mobilecomputing.uberlikeandroidapp;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -12,6 +16,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -42,14 +48,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Location mLastLocation;
     private LocationRequest request;
     private GoogleMap mMap;
-    LatLng currentLocation;
-    LatLng requestLocation;
-    double lat;
-    double longitude;
-    String type="driver"; //The type of the user (a driver or a client)
-    String ID="5724859b987e1b7c2a555e77"; //Id if the user from registeration
-    double lastLat = 0;
-    double lastLong = 0;
+    private LatLng currentLocation;
+    private LatLng requestLocation;
+
+    BroadcastReceiver loginEventHandler;
+
+    Button signUp;
+    Button login;
+    Button requestRide;
+    private double lat;
+    private double longitude;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +68,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
+        loginEventHandler = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Toast.makeText(getApplicationContext(), "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq", Toast.LENGTH_SHORT).show();
+            }
+        };
+        registerReceiver(loginEventHandler, new IntentFilter("Data_GCM"));
+
         boolean Services_available = checkGooglePlayServices(this);
         if (Services_available) {
             buildGoogleApiClient();
@@ -66,6 +84,40 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         currentLocation = new LatLng(0,0);
         requestLocation = new LatLng(10,10);
+
+        signUp = (Button)findViewById(R.id.signupButton);
+        login = (Button)findViewById(R.id.login);
+        requestRide = (Button)findViewById(R.id.requestRideBtn);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("Uber", 0);
+
+        if(sharedPreferences.getBoolean("registered", false)) {
+            signUp.setVisibility(View.GONE);
+            if(sharedPreferences.getBoolean("logged_in", false)) {
+                login.setVisibility(View.GONE);
+            }
+            else {
+                login.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent loginActivity = new Intent(MainActivity.this, Login.class);
+                        startActivity(loginActivity);
+                    }
+                });
+                requestRide.setVisibility(View.GONE);
+            }
+
+        }
+        else {
+            signUp.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent signup = new Intent(MainActivity.this, Signup.class);
+                    startActivity(signup);
+                }
+            });
+            requestRide.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -110,29 +162,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //This method is invoked after requestLocationUpdates
     @Override
     public void onLocationChanged(Location location) {
-
         mLastLocation = location;
-
         if (mLastLocation != null) {
-            Toast.makeText(this, "Latitude:" + mLastLocation.getLatitude() + ", Longitude:" + mLastLocation.getLongitude(), Toast.LENGTH_LONG).show();
+            // Toast.makeText(this, "Latitude:" + mLastLocation.getLatitude() + ", Longitude:" + mLastLocation.getLongitude(), Toast.LENGTH_LONG).show();
+
+            mLastLocation = location;
+
+            if (mLastLocation != null) {
+                Toast.makeText(this, "Latitude:" + mLastLocation.getLatitude() + ", Longitude:" + mLastLocation.getLongitude(), Toast.LENGTH_LONG).show();
+            }
+            double lastLat = 0;
+            int latEqual = Double.compare(mLastLocation.getLatitude(), lastLat);
+            double lastLong = 0;
+            int LongEqual = Double.compare(mLastLocation.getLongitude(), lastLong);
+            if ((mLastLocation.getLatitude() - lastLat == 0.005) && (mLastLocation.getLongitude() - lastLong == 0.0005)) {
+                lastLat = mLastLocation.getLatitude();
+                lastLong = mLastLocation.getLongitude();
+                this.lat = mLastLocation.getLatitude();
+                this.longitude = mLastLocation.getLongitude();
+                PutLocation test = new PutLocation();
+                test.execute();
+
+            }
         }
-        int latEqual=Double.compare(mLastLocation.getLatitude(),lastLat);
-        int LongEqual=Double.compare(mLastLocation.getLongitude(),lastLong);
-        if ((mLastLocation.getLatitude() - lastLat == 0.005) && (mLastLocation.getLongitude() - lastLong == 0.0005) ) {
-            lastLat = mLastLocation.getLatitude();
-            lastLong = mLastLocation.getLongitude();
-            this.lat=mLastLocation.getLatitude();
-            this.longitude=mLastLocation.getLongitude();
-            PutLocation test=new PutLocation();
-            test.execute();
-
-        }
-    }
-
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 
     //Create Location requests to periodically request a location update
@@ -212,8 +264,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMarkerDragStart(Marker marker) {
 
     }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
     class PutLocation extends AsyncTask <Void,Void,Void>{
-    String Url="http://uberlikeapp-ad3rhy2.rhcloud.com//api/user/updateUserLocation";
+        private static final String ID = "id";
+        String Url="http://uberlikeapp-ad3rhy2.rhcloud.com//api/user/updateUserLocation";
         StringBuilder stringBuilder;
         @Override
         protected void onPostExecute(Void aVoid) {
@@ -230,6 +289,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 URL url = new URL(Url);
                 HttpURLConnection urlConnection =(HttpURLConnection)url.openConnection();
                 urlConnection.setRequestMethod("PUT");
+                String type = "oo";
                 urlConnection.setRequestProperty("type", type);
                 urlConnection.setRequestProperty("driver_id", ID);
                 urlConnection.setRequestProperty("lat", String.valueOf(lat));
@@ -256,5 +316,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             } finally{}
             return null;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(loginEventHandler);
     }
 }

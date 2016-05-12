@@ -1,0 +1,35 @@
+{
+  "project_info": {
+    "project_number": "936214639595",
+    "project_id": "uberlikeapp-1296"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:936214639595:android:261ab05a0280614f",
+        "android_client_info": {
+          "package_name": "com.mobilecomputing.uberlikeandroidapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGfUm0L6zoeqDx95-2JB83yyAAMFBotyE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
