@@ -20,7 +20,10 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import com.mobilecomputing.uberlikeandroidapp.DataModels.Client;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -83,7 +86,8 @@ public class Signup extends AppCompatActivity {
                     client.setMobile(mob);
 
                     if(checkPlayServices()) {
-                        new RegisterGCM(gcm, getApplicationContext(), editor, client).execute();
+                        RegisterGCM registration = new RegisterGCM(gcm, getApplicationContext(), editor, client);
+                        registration.execute();
                     }
                 }
                 else {
@@ -139,6 +143,7 @@ public class Signup extends AppCompatActivity {
         String regid;
         SharedPreferences.Editor editor;
         Client client;
+        Registration registration;
 
         RegisterGCM(GoogleCloudMessaging g, Context c, SharedPreferences.Editor e, Client cl) {
             gcm = g;
@@ -170,29 +175,45 @@ public class Signup extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-
+            registration = new Registration();
+            registration.execute();
         }
     }
 
     class Registration extends AsyncTask<String, String, String> {
 
-        String urlPath = "http://uberlikeapp-ad3rhy2.rhcloud.com//api/user/signup";
-
+        private String urlPath = "http://uberlikeapp-ad3rhy2.rhcloud.com//api/user/signup";
+        public StringBuilder response;
         @Override
         protected String doInBackground(String... params) {
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
 
             if(isNetworkAvailable()) {
                 if (isOnline()) {
                     try {
                         URL url = new URL(urlPath);
-                        HttpURLConnection urlConnection =(HttpURLConnection)url.openConnection();
+                        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                        urlConnection.setRequestMethod("POST");
+                        urlConnection.setRequestProperty("fullName", client.getFullName());
+                        urlConnection.setRequestProperty("type", client.getType());
+                        urlConnection.setRequestProperty("password", client.getPassword());
+                        urlConnection.setRequestProperty("email", client.getEmail());
+                        urlConnection.setRequestProperty("mobile", client.getMobile());
+                        urlConnection.setRequestProperty("reg_id", client.getReg_id());
 
+                        urlConnection.setRequestProperty("lat", "31");
+                        urlConnection.setRequestProperty("lng", "31");
+
+                        urlConnection.setDoInput(true);
+                        urlConnection.setDoOutput(true);
+                        urlConnection.connect();
+
+                        InputStream in = urlConnection.getInputStream();
+                        response = new StringBuilder();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            response.append(line);
+                        }
                     } catch (MalformedURLException e) {
                         e.printStackTrace();
                     } catch (IOException e) {
@@ -200,6 +221,13 @@ public class Signup extends AppCompatActivity {
                     }
                 }
             }
+            return "Valid";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Toast.makeText(getApplicationContext(), response.toString(), Toast.LENGTH_LONG).show();
         }
 
         private Boolean isNetworkAvailable() {

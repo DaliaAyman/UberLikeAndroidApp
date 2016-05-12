@@ -3,6 +3,7 @@ package com.mobilecomputing.uberlikeandroidapp;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -44,12 +45,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     LatLng currentLocation;
     LatLng requestLocation;
-    double lat;
-    double longitude;
-    String type="driver"; //The type of the user (a driver or a client)
-    String ID="5724859b987e1b7c2a555e77"; //Id if the user from registeration
-    double lastLat = 0;
-    double lastLong = 0;
+
+    Button signUp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +63,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         currentLocation = new LatLng(0,0);
         requestLocation = new LatLng(10,10);
+
+        signUp = (Button)findViewById(R.id.signupButton);
+        signUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent signup = new Intent(MainActivity.this, Signup.class);
+                startActivity(signup);
+            }
+        });
+
     }
 
     @Override

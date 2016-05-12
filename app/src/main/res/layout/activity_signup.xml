@@ -13,7 +13,6 @@
         android:inputType="textEmailAddress"
         android:ems="10"
         android:text="Ex: user@domain.com"
-        android:textColor="@color/place_autocomplete_prediction_primary_text_highlight"
         android:id="@+id/email_1"
         android:layout_marginTop="138dp"
         android:layout_alignParentTop="true"
@@ -52,8 +51,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="56dp"
-        android:layout_alignRight="@+id/email"
-        android:layout_alignEnd="@+id/email" />
+        android:layout_alignRight="@+id/email_1"
+        android:layout_alignEnd="@+id/email_1" />
 
     <EditText
         android:layout_width="wrap_content"
