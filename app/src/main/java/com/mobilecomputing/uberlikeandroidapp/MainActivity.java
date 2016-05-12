@@ -68,8 +68,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         loginEventHandler = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Toast.makeText(getApplicationContext(), intent.getExtras().toString(), Toast.LENGTH_LONG).show();
-                mMap.addMarker(new MarkerOptions().position(new LatLng(34,34)).title("Ahmed Addition"));
+                Toast.makeText(getApplicationContext(), "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq", Toast.LENGTH_SHORT).show();
             }
         };
         registerReceiver(loginEventHandler, new IntentFilter("Data_GCM"));
