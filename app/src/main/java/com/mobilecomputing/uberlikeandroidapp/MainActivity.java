@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public final int  MY_PERMISSIONS_REQUEST_FINE_LOCATION = 0;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
+    private LatLng myLocation;
     private LocationRequest request;
     private GoogleMap mMap;
     private LatLng currentLocation;
@@ -152,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .draggable(true)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
-
+       // mMap.addMarker(new MarkerOptions().position(mLastLocation).title("My Actual Location"));
         //mMap.setMyLocationEnabled(true);
 
     }
