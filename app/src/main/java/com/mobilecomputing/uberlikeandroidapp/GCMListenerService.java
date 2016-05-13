@@ -16,6 +16,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.gcm.GcmListenerService;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class GCMListenerService extends GcmListenerService {
     public GCMListenerService() {
 
@@ -23,28 +26,30 @@ public class GCMListenerService extends GcmListenerService {
 
     @Override
     public void onMessageReceived(String from, Bundle data) {
- //       super.onMessageReceived(from, data);
-
-        //Toast.makeText(getApplicationContext(), "HHAHAHAHAHHAHAHA", Toast.LENGTH_LONG).show();
-        sendNotification((Bundle) data.get("notification"));
+        super.onMessageReceived(from, data);
+        try {
+            handleNotification(data);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void sendNotification(Bundle s) {
+    private void handleNotification(Bundle s) throws JSONException {
+
+        if(s.getString("title").equalsIgnoreCase("updateLocation")) {
+            Intent i = new Intent("Data_GCM");
+            String data = s.getString("driver_location_data");
+            JSONObject json = new JSONObject(data);
+
+            i.putExtra("driver_id", json.getString("driver_id"));
+            i.putExtra("driver_data", json.getJSONObject("driver_data").getString("ay"));
+            sendBroadcast(i);
+        }
+
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_ONE_SHOT);
-
-
-        Intent i = new Intent("Data_GCM");
-
-        i.putExtra("email", "Ahmed");
-        i.putExtra("password", "pass");
-
-        sendBroadcast(i);
-
-
-        //Log.d("Ahmed", s.getString("body"));
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 

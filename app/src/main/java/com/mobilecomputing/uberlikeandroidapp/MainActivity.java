@@ -16,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -33,6 +34,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.mobilecomputing.uberlikeandroidapp.DataModels.Driver;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,8 +43,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerDragListener, LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
     public final int  MY_PERMISSIONS_REQUEST_FINE_LOCATION = 0;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
@@ -51,7 +55,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LatLng currentLocation;
     private LatLng requestLocation;
 
-    BroadcastReceiver loginEventHandler;
+    BroadcastReceiver driverLocationUpdatesReceiver;
+
+    HashMap<String, Driver> currentDrivers;
 
     Button signUp;
     Button login;
@@ -68,14 +74,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        currentDrivers = new HashMap();
 
-        loginEventHandler = new BroadcastReceiver() {
+        driverLocationUpdatesReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Toast.makeText(getApplicationContext(), "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq", Toast.LENGTH_SHORT).show();
+                Log.d("Updates data", intent.getExtras().toString());
+                Toast.makeText(getApplicationContext(), intent.getExtras().toString(), Toast.LENGTH_SHORT).show();
+
             }
         };
-        registerReceiver(loginEventHandler, new IntentFilter("Data_GCM"));
+        registerReceiver(driverLocationUpdatesReceiver, new IntentFilter("Data_GCM"));
 
         boolean Services_available = checkGooglePlayServices(this);
         if (Services_available) {
@@ -321,6 +330,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(loginEventHandler);
+        unregisterReceiver(driverLocationUpdatesReceiver);
     }
 }
