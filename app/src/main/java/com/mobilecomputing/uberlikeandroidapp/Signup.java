@@ -1,27 +1,28 @@
 package com.mobilecomputing.uberlikeandroidapp;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-
 import com.google.android.gms.iid.InstanceID;
 import com.mobilecomputing.uberlikeandroidapp.DataModels.Client;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,7 +31,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 
 public class Signup extends AppCompatActivity {
@@ -185,6 +185,27 @@ public class Signup extends AppCompatActivity {
 
         private String urlPath = "http://uberlikeapp-ad3rhy2.rhcloud.com//api/user/signup";
         public StringBuilder response;
+        public String JSONResponse;
+        boolean valid;
+        String Id;
+        private boolean validate(String JSONString){
+            boolean validation=false;
+            try {
+                JSONObject ValidationJSON=new JSONObject(JSONString);
+                validation=ValidationJSON.getBoolean("valid");
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return validation;
+        }
+        private String getRegID(String JSONString) throws JSONException {
+            String RegID=null;
+            JSONObject jsonObject=new JSONObject(JSONString);
+            RegID=jsonObject.getString("client_id");
+            return RegID;
+
+        }
         @Override
         protected String doInBackground(String... params) {
 
@@ -215,6 +236,8 @@ public class Signup extends AppCompatActivity {
                         while ((line = reader.readLine()) != null) {
                             response.append(line);
                         }
+                        JSONResponse=response.toString();
+                        valid=validate(JSONResponse);
                     } catch (MalformedURLException e) {
                         e.printStackTrace();
                     } catch (IOException e) {
@@ -228,10 +251,25 @@ public class Signup extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            editor.putBoolean("registered", true);
-            editor.commit();
-            Toast.makeText(getApplicationContext(), response.toString() + "               Hello from ahmed", Toast.LENGTH_LONG).show();
-        }
+            if(valid) {
+                try {
+                   Id= getRegID(JSONResponse);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                editor.putBoolean("registered", true);
+                editor.putString("client_id",Id);
+                editor.commit();
+                Intent toLogin =new Intent(getApplicationContext(),MainActivity.class);
+                startActivity(toLogin);
+
+                //Toast.makeText(getApplicationContext(), response.toString() + "               Hello from ahmed", Toast.LENGTH_LONG).show();
+            }
+            else {
+                Toast.makeText(getApplicationContext(),"Email Already Exists ,Try Another One ",Toast.LENGTH_LONG);
+
+            }
+            }
 
         private Boolean isNetworkAvailable() {
             ConnectivityManager connectivityManager
