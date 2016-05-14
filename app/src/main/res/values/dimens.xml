@@ -5,4 +5,5 @@
     <dimen name="lite_mode_map_width">350dp</dimen>
     <dimen name="lite_mode_map_height">300dp</dimen>
     <dimen name="padding_bottom">8dp</dimen>
+    <dimen name="padding_top">32dp</dimen>
 </resources>
