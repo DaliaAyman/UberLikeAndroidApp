@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double lat;
     private double longitude;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,12 +81,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         driverLocationUpdatesReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.d("Updates data", intent.getExtras().toString());
+                Driver driver = new Driver();
+                driver.setCurrentLocation(intent.getExtras().getDouble("lat"), intent.getExtras().getDouble("lng"));
+                driver.setDriverID(intent.getExtras().getString("driver_id"));
+
+                currentDrivers.put(driver.getDriverID(), driver);
+
                 Toast.makeText(getApplicationContext(), intent.getExtras().toString(), Toast.LENGTH_SHORT).show();
 
             }
         };
-        registerReceiver(driverLocationUpdatesReceiver, new IntentFilter("Data_GCM"));
+        registerReceiver(driverLocationUpdatesReceiver, new IntentFilter("Driver_data"));
+
+
 
         boolean Services_available = checkGooglePlayServices(this);
         if (Services_available) {
@@ -161,7 +169,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-
         startLocationUpdates();
     }
 
@@ -175,9 +182,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mLastLocation = location;
         if (mLastLocation != null) {
             // Toast.makeText(this, "Latitude:" + mLastLocation.getLatitude() + ", Longitude:" + mLastLocation.getLongitude(), Toast.LENGTH_LONG).show();
-
             mLastLocation = location;
-
             if (mLastLocation != null) {
                 Toast.makeText(this, "Latitude:" + mLastLocation.getLatitude() + ", Longitude:" + mLastLocation.getLongitude(), Toast.LENGTH_LONG).show();
             }
@@ -185,15 +190,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             int latEqual = Double.compare(mLastLocation.getLatitude(), lastLat);
             double lastLong = 0;
             int LongEqual = Double.compare(mLastLocation.getLongitude(), lastLong);
-            if ((mLastLocation.getLatitude() - lastLat == 0.005) && (mLastLocation.getLongitude() - lastLong == 0.0005)) {
+            if ((mLastLocation.getLatitude() - lastLat == 0.00005) && (mLastLocation.getLongitude() - lastLong == 0.00005)) {
                 lastLat = mLastLocation.getLatitude();
                 lastLong = mLastLocation.getLongitude();
                 this.lat = mLastLocation.getLatitude();
                 this.longitude = mLastLocation.getLongitude();
                 PutLocation test = new PutLocation();
                 test.execute();
-
             }
+        }
+
+        for(String driverID: currentDrivers.keySet()) {
+            Driver driver = currentDrivers.get(driverID);
+            mMap.addMarker(new MarkerOptions().position(driver.getCurrentLocation()).draggable(false));
         }
     }
 
@@ -293,7 +302,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         @Override
         protected Void doInBackground(Void... params) {
 
-
             try{
 
                 URL url = new URL(Url);
@@ -301,7 +309,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 urlConnection.setRequestMethod("PUT");
                 String type = "oo";
                 urlConnection.setRequestProperty("type", type);
-                urlConnection.setRequestProperty("driver_id", ID);
+                urlConnection.setRequestProperty("client_id", getSharedPreferences("Uber", 0).getString("client_id", null));
                 urlConnection.setRequestProperty("lat", String.valueOf(lat));
                 urlConnection.setRequestProperty("lng", String.valueOf(longitude));
                 urlConnection.setDoInput(true);
@@ -314,10 +322,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 while ((line = reader.readLine()) != null) {
                     stringBuilder.append(line);
                 }
-
-
-
-
             }
            catch (MalformedURLException e) {
                 e.printStackTrace();
