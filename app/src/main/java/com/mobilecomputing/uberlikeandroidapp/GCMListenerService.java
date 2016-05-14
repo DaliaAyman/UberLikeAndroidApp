@@ -15,6 +15,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.gcm.GcmListenerService;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,11 +28,20 @@ public class GCMListenerService extends GcmListenerService {
     @Override
     public void onMessageReceived(String from, Bundle data) {
         super.onMessageReceived(from, data);
-        try {
-            handleNotification(data);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if(data.getString("to").equalsIgnoreCase("client")) {
+            handleDriverData(data.getString("lat"), data.getString("lng"), data.getString("driver_id"));
         }
+        else {
+
+        }
+    }
+
+    private void handleDriverData(String lat, String lng, String driver_id) {
+        Intent driverLocationIntent = new Intent("Driver_data");
+        driverLocationIntent.putExtra("driver_id", driver_id);
+        driverLocationIntent.putExtra("lat", Double.valueOf(lat));
+        driverLocationIntent.putExtra("lng", Double.valueOf(lng));
+        sendBroadcast(driverLocationIntent);
     }
 
     private void handleNotification(Bundle s) throws JSONException {

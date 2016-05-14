@@ -89,6 +89,7 @@ public class Login extends AppCompatActivity {
                     }
                     urlConnection.setRequestProperty("password", pass);
                     urlConnection.setRequestProperty("email", mail);
+                    urlConnection.setRequestProperty("type", "client");
 
                     urlConnection.setDoInput(true);
                     urlConnection.setDoOutput(true);
