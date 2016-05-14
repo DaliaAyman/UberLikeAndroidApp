@@ -11,12 +11,18 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.mobilecomputing.uberlikeandroidapp.Utilities.Global;
+
+import java.io.Serializable;
 
 public class RequestRideActivity extends AppCompatActivity implements OnMapReadyCallback{
 
     private GoogleMap mapLite;
     private static final int RC_DROP_OFF = 9100;
     private Button confirmRide;
+    private static Serializable lat;
+    private static Serializable lon;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +42,10 @@ public class RequestRideActivity extends AppCompatActivity implements OnMapReady
                 startActivityForResult(intent, 9100);
             }
         });
+
+        Intent intent = getIntent();
+        lat = intent.getSerializableExtra(Global.PICKUP_LAT);
+        lon = intent.getSerializableExtra(Global.PICKUP_LON);
     }
 
     @Override

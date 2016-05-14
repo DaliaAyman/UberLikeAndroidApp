@@ -21,8 +21,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-import android.view.View;
-import android.widget.Button;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -38,6 +36,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.mobilecomputing.uberlikeandroidapp.DataModels.Driver;
+import com.mobilecomputing.uberlikeandroidapp.Utilities.Global;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -79,6 +78,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        Button requestRide = (Button) findViewById(R.id.requestRideBtn);
+        requestRide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, RequestRideActivity.class);
+                intent.putExtra(Global.PICKUP_LAT, lat);
+                intent.putExtra(Global.PICKUP_LON, longitude);
+                startActivity(intent);
+            }
+        });
         currentDrivers = new HashMap();
 
         driverLocationUpdatesReceiver = new BroadcastReceiver() {
@@ -91,14 +100,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 currentDrivers.put(driver.getDriverID(), driver);
 
                 Toast.makeText(getApplicationContext(), intent.getExtras().toString(), Toast.LENGTH_SHORT).show();
-        Button requestRide = (Button) findViewById(R.id.home_request_ride);
-        requestRide.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, RequestRideActivity.class);
-                startActivity(intent);
-            }
-        });
 
             }
         };
@@ -192,7 +193,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onLocationChanged(Location location) {
         mLastLocation = location;
         if (mLastLocation != null) {
-            // Toast.makeText(this, "Latitude:" + mLastLocation.getLatitude() + ", Longitude:" + mLastLocation.getLongitude(), Toast.LENGTH_LONG).show();
             mLastLocation = location;
             if (mLastLocation != null) {
                 Toast.makeText(this, "Latitude:" + mLastLocation.getLatitude() + ", Longitude:" + mLastLocation.getLongitude(), Toast.LENGTH_LONG).show();
