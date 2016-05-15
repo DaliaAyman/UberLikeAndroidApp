@@ -16,7 +16,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -27,10 +26,12 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -53,8 +54,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LatLng myLocation;
     private LocationRequest request;
     private GoogleMap mMap;
-    private LatLng currentLocation;
     private LatLng requestLocation;
+    private boolean defaultRequestLocation = true;
 
     BroadcastReceiver driverLocationUpdatesReceiver;
 
@@ -100,7 +101,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             buildGoogleApiClient();
             createLocationRequest();
         }
-        currentLocation = new LatLng(0,0);
         requestLocation = new LatLng(10,10);
 
         signUp = (Button)findViewById(R.id.signupButton);
@@ -154,12 +154,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap map) {
 
         mMap = map;
-        mMap.addMarker(new MarkerOptions().position(currentLocation).title("Current Location"));
-
-        mMap.addMarker(new MarkerOptions()
-                .position(requestLocation)
-                .draggable(true)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
        // mMap.addMarker(new MarkerOptions().position(mLastLocation).title("My Actual Location"));
         //mMap.setMyLocationEnabled(true);
@@ -185,6 +179,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             mLastLocation = location;
             if (mLastLocation != null) {
                 Toast.makeText(this, "Latitude:" + mLastLocation.getLatitude() + ", Longitude:" + mLastLocation.getLongitude(), Toast.LENGTH_LONG).show();
+                requestLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+
             }
             double lastLat = 0;
             int latEqual = Double.compare(mLastLocation.getLatitude(), lastLat);
@@ -202,8 +198,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         for(String driverID: currentDrivers.keySet()) {
             Driver driver = currentDrivers.get(driverID);
-            mMap.addMarker(new MarkerOptions().position(driver.getCurrentLocation()).draggable(false));
+            mMap.addMarker(new MarkerOptions().position(driver.getCurrentLocation())
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_car))
+                    .draggable(false));
         }
+
+
+        if(defaultRequestLocation == true){
+
+            mMap.addMarker(new MarkerOptions()
+                    .position(requestLocation)
+                    .draggable(true)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                    .title("Pickup Location"));
+            defaultRequestLocation = false;
+        }
+
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(requestLocation)      // Sets the center of the map to current location
+                .zoom(17)                   // Sets the zoom
+                .build();                   // Creates a CameraPosition from the builder
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
     }
 
     //Create Location requests to periodically request a location update
