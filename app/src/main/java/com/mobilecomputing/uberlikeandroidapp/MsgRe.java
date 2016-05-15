@@ -28,10 +28,10 @@ public class MsgRe extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Bundle extras = intent.getExtras();
+        //Bundle extras = intent.getExtras();
 
         //Log.d("Trial", extras.toString());
-        Toast.makeText(context, "Notified" + extras.toString(), Toast.LENGTH_LONG).show();
+        //Toast.makeText(context, "Notified" + extras.toString(), Toast.LENGTH_LONG).show();
 
         //LocalBroadcastManager.getInstance(context).sendBroadcast();
         ComponentName comp = new ComponentName(context.getPackageName(),GCMListenerService.class.getName());

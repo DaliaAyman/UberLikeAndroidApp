@@ -45,6 +45,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerDragListener, LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -203,6 +205,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .draggable(false));
         }
 
+        updateDriversMap();
 
         if(defaultRequestLocation == true){
 
@@ -222,6 +225,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    private void updateDriversMap() {
+        for(Iterator<Map.Entry<String, Driver>> it = currentDrivers.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<String, Driver> entry = it.next();
+            if(Math.abs(entry.getValue().getCurrentLocation().latitude - lat) > 0.005 || Math.abs(entry.getValue().getCurrentLocation().longitude - longitude) > 0.005) {
+                it.remove();
+            }
+        }
+    }
+    
     //Create Location requests to periodically request a location update
     protected void createLocationRequest() {
         request = new LocationRequest();
@@ -240,7 +252,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     protected void startLocationUpdates() {
-
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED){

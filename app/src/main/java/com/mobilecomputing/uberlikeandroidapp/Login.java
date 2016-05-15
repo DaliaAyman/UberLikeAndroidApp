@@ -45,7 +45,7 @@ public class Login extends AppCompatActivity {
 
         username = (EditText)findViewById(R.id.username_login);
         password = (EditText)findViewById(R.id.password_login);
-        ok = (Button)findViewById(R.id.ok_login);
+        ok = (Button)findViewById(R.id.ok_login_1);
 
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,7 +160,6 @@ public class Login extends AppCompatActivity {
             else {
                 Toast.makeText(getApplicationContext(), "No network", Toast.LENGTH_LONG).show();
             }
-
             return null;
         }
 
@@ -176,12 +175,10 @@ public class Login extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 editor.putBoolean("logged_in", true);
-                editor.putString("User_id",UserId);
+                editor.putString("client_id",UserId);
                 editor.commit();
                 Intent toMap = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(toMap);
-
-
             } else {
                 Toast.makeText(getApplicationContext(), "Sorry ! Wrong Password", Toast.LENGTH_LONG).show();
                 TextView InvalidText=(TextView) findViewById(R.id.ValidationText);
