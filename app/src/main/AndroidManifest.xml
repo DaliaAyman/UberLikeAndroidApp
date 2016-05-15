@@ -42,11 +42,13 @@
         </receiver>
 
         <activity android:name=".MainActivity" >
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            
         </activity>
         <activity android:name=".Signup" >
         </activity>
@@ -58,6 +60,9 @@
 
         </activity>
 
+        <activity android:name=".TrackDriverActivity">
+
+        </activity>
         <service
             android:name=".GCMListenerService"
             android:exported="false" >
@@ -75,13 +80,10 @@
             </intent-filter>
         </service>
 
-
-        <activity android:name=".Login" >
-        </activity>
-
         <service
             android:name=".FetchAddressIntentService"
             android:exported="false"></service>
+
     </application>
 
 </manifest>
