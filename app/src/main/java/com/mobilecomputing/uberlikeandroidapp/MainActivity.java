@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -35,6 +36,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.mobilecomputing.uberlikeandroidapp.DataModels.Driver;
+import com.mobilecomputing.uberlikeandroidapp.Utilities.Global;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -76,6 +78,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        Button requestRide = (Button) findViewById(R.id.requestRideBtn);
+        requestRide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, RequestRideActivity.class);
+                intent.putExtra(Global.PICKUP_LAT, lat);
+                intent.putExtra(Global.PICKUP_LON, longitude);
+                startActivity(intent);
+            }
+        });
         currentDrivers = new HashMap();
 
         driverLocationUpdatesReceiver = new BroadcastReceiver() {
@@ -181,7 +193,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onLocationChanged(Location location) {
         mLastLocation = location;
         if (mLastLocation != null) {
-            // Toast.makeText(this, "Latitude:" + mLastLocation.getLatitude() + ", Longitude:" + mLastLocation.getLongitude(), Toast.LENGTH_LONG).show();
             mLastLocation = location;
             if (mLastLocation != null) {
                 Toast.makeText(this, "Latitude:" + mLastLocation.getLatitude() + ", Longitude:" + mLastLocation.getLongitude(), Toast.LENGTH_LONG).show();

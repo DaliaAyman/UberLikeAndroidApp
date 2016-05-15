@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.mobilecomputing.uberlikeandroidapp.RequestRideActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical">
+
+        <fragment
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/request_ride_lite_mode_map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/lite_mode_map_height"
+            map:cameraZoom="5"
+            map:mapType="normal"
+            map:liteMode="true"
+            tools:ignore="MissingPrefix"
+            android:paddingBottom="@dimen/padding_bottom">
+        </fragment>
+
+        <TextView
+            android:id="@+id/request_ride_from_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="From Abbasiya"
+            android:paddingBottom="@dimen/padding_bottom"/>
+
+        <TextView
+            android:id="@+id/request_ride_cash"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Estimated Cash"
+            android:paddingBottom="@dimen/padding_bottom"/>
+        <Button
+            android:id="@+id/request_ride_add_dropoff_button"
+            android:text="Add Drop off Location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingBottom="@dimen/padding_bottom"/>
+        <Button
+            android:id="@+id/request_ride_confirm_ride"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:text="Confirm Ride"
+            android:paddingBottom="@dimen/padding_bottom"/>
+    </LinearLayout>
+</RelativeLayout>
