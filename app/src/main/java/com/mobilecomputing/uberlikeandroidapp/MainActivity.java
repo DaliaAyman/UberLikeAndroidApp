@@ -252,7 +252,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     protected void startLocationUpdates() {
-
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED){
