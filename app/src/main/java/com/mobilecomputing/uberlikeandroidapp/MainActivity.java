@@ -198,7 +198,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         for(String driverID: currentDrivers.keySet()) {
             Driver driver = currentDrivers.get(driverID);
-            mMap.addMarker(new MarkerOptions().position(driver.getCurrentLocation()).draggable(false));
+            mMap.addMarker(new MarkerOptions().position(driver.getCurrentLocation())
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_car))
+                    .draggable(false));
         }
 
 
